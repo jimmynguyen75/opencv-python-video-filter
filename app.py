@@ -3,6 +3,8 @@ from flask_socketio import SocketIO, emit
 import cv2
 import base64
 import numpy as np
+import eventlet
+import eventlet.wsgi
 
 app = Flask(__name__)
 socketio = SocketIO(app)
