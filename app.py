@@ -1,10 +1,11 @@
+import eventlet
+eventlet.monkey_patch()  # Gọi đúng hàm này
+
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import cv2
 import base64
 import numpy as np
-import eventlet
-import eventlet.wsgi
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -47,5 +48,4 @@ def handle_video_frame(data):
     emit('processed_frame', frame_data_url)
 
 if __name__ == '__main__':
-    eventlet.monkey_patch()  # Eventlet yêu cầu phải có monkey patch
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5001)

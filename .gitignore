@@ -1,0 +1,25 @@
+# Ignore virtual environment folders
+venv/
+env/
+.virtualenv/
+path/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore system files
+.DS_Store
+
+# Ignore pip cache
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore IDE settings (nếu bạn sử dụng các IDE như VSCode hoặc PyCharm)
+.vscode/
+.idea/
+
+# Ignore log files and temp files
+*.log
+*.tmp
