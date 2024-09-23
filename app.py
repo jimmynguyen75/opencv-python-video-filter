@@ -45,4 +45,5 @@ def handle_video_frame(data):
     emit('processed_frame', frame_data_url)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    eventlet.monkey_patch()  # Eventlet yêu cầu phải có monkey patch
+    socketio.run(app, host='0.0.0.0', port=5000)
