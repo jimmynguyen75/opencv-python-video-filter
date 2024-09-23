@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Stream with Editing Features</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        let socket = io.connect(window.location.origin);
+
+        function startWebcam() {
+            let video = document.getElementById('video');
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.error("Error accessing webcam: ", err);
+                    alert("Could not access webcam. Please check your permissions and try again.");
+                });
+        }
+
+        window.onload = function() {
+            startWebcam();
+
+            let video = document.getElementById('video');
+            let canvas = document.createElement('canvas');
+            let context = canvas.getContext('2d');
+
+            setInterval(() => {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    let frame = canvas.toDataURL('image/jpeg');
+                    let action = document.querySelector('input[name="action"]:checked').value;
+                    let brightness = document.getElementById('brightness-range').value;
+
+                    socket.emit('video_frame', {
+                        frame: frame,
+                        action: action,
+                        brightness: brightness
+                    });
+                }
+            }, 100);
+
+            socket.on('processed_frame', function(data) {
+                document.getElementById('processed-video').src = data;
+            });
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Webcam Stream with Real-Time Editing</h1>
+
+        <div class="video-container">
+            <div class="video-wrapper">
+                <video id="video" autoplay></video>
+            </div>
+            <div class="video-wrapper">
+                <img id="processed-video" alt="Processed Video">
+            </div>
+        </div>
+
+        <div class="controls">
+            <h2>Choose Action:</h2>
+            <div class="radio-group">
+                <label><input type="radio" name="action" value="filter" checked> Filter</label>
+                <label><input type="radio" name="action" value="denoise"> Denoise</label>
+                <label><input type="radio" name="action" value="brightness"> Adjust Brightness</label>
+                <label><input type="radio" name="action" value="detect_bound"> Detect Boundaries</label>
+            </div>
+
+            <div class="brightness-control">
+                <label for="brightness-range">Brightness:</label>
+                <input type="range" id="brightness-range" min="-100" max="100" value="0">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
